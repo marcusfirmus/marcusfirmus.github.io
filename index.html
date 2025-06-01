@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="utf-8">
+  <meta name="generator" content="pandoc">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <meta name="author" content="Marcus Firmus">
+  <title>Wyściółka szuflady biurka programisty</title>
+  <style>
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    span.underline{text-decoration: underline;}
+    div.column{display: inline-block; vertical-align: top; width: 50%;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    ul.task-list{list-style: none;}
+  </style>
+  <link rel="stylesheet" href="static/css/styles.css">
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code&display=swap" rel="stylesheet">
+</head>
+<body>
+  <header id="title-block-header">
+    <h1 class="title">Wyściółka szuflady biurka programisty</h1>
+          </header>
+<main role="main">
+  <article>
+    <p><strong><em>Wyściółka szuflady biurka programisty</em></strong> to miejsce na prywatne eksperymenty, artykuły i eseje. Dotyczą programowania, języków (<a href="mediolan/mediolan.html"><strong>Mediolan</strong></a>), kompilatorów, obliczeń, ale także rynku walut (<a href="fx/fx.html"><strong>Forex</strong></a>) i narzędzi do tworzenia muzyki (<a href="akolada/akolada.html"><strong>Akolada</strong></a>). Pojawią się tu na pewno i inne tematy.</p>
+    <h2 id="autor">Autor</h2>
+    <p><a href="https://github.com/marcusfirmus"><strong>Marcus Firmus</strong> (https://github.com/marcusfirmus)</a></p>
+    <p><strong>Kontakt</strong> marcusfirmus@gmail.com</p>
+    <h2 id="eseje-i-artykuły">Eseje i artykuły</h2>
+    <ul>
+    <li><a href="zaproszenie.html"><strong>Zaproszenie</strong></a> - Skąd się wzięła “Wyściółka”, co to jest “Szuflada”.</li>
+    <li><a href="AI.html"><strong>Sztuczna Inteligencja</strong></a> - W jaki sposób AI staje się inspiracją.</li>
+    <li><em>Niedługo pojawi się więcej …</em></li>
+    </ul>
+    <h2 id="przedsięwzięcia">Przedsięwzięcia</h2>
+    <p><a id="Akolada"></a> <a href="akolada/akolada.html"><strong>Akolada</strong></a> - Język zapisu muzyki. Implementacja obejmuje translację na MIDI. Działający prototyp translatora potrafi generować zaskakująco dobrze brzmiące utwory. Oczywiście, o ile kompozytor lub kopista dobrze je zapisze!</p>
+    <pre><code>
+          o: instr=71, begin+={0..0.1}, vol*={0.9..1.1}
+          modifier &gt;: down, up, vol*=1.5
+       
+          +-- tempo 120   +-------+-------+-------+-------+-------+-------+-------+-------+-------
+          |                       |                       |                       |        
+          +-------+-------+-------+-------+-------+-------+-------+-------+-------+-------+-------
+          |       o               |                       |                       |        
+          +-------+o------+-------+-------+-------+-------+-------+-------+-------+-------+-------
+          |   o     # o===        |                       |                       |          
+     G:   o-------+-------+-------+-------+-------+-------+-------+-------+-------+-------+-------
+          |                     o===                      |                       |          
+          +-------+-------+------  b o  --x-x- x x -------+-------+-------+-------+-------+-------
+                             &gt;    &gt;
+    </code></pre>
+    <p><a id="Mediolan"></a> <a href="mediolan/mediolan.html"><strong>Mediolan</strong></a> - Eksperymentalny język programowania stworzony po to, żeby udowodnić możliwość optymalnego alokowania pamięci. Używamy Data Flow Analysis i alokacji regionami.</p>
+    <pre><code>
+         function  generate( max, acc )
+         {
+            while(1) {
+                 x1 = phi( acc, x4 );               //  T1(i) = Tacc | T4(i)&#39;
+                 x2 = car( x1 );                    //  T2(i) = car(T1(i))
+                 if ( x2 &gt;= max )
+                         return  x1;
+                 else   
+                         x3 = x2 + 1;
+                         x4 = cons[1]( x3, x1 );    //  T4(i) = cons[1,i](int, T1(i))
+            }
+         }
+    </code></pre>
+    <p><a id="Forex"></a> <a href="fx/fx.html"><strong>Forex</strong></a> - Proponuję głęboki wgląd w dynamikę Forexu. Motywowany <strong>oczywiście</strong> próbami znalezienia Świętego Graala, czyli zbudowania Zawsze Zarabiającego Systemu. W teorii jesteśmy zaskakująco blisko takiego systemu, a przy okazji odwiedzamy bardzo ciekawe zagadnienia.</p>
+    <p><img src="static/images/fx.svg" /></p>
+    <p><em>Być może pojawią się kolejne…</em></p>
+    <pre><code>     ??? ...
+    </code></pre>
+  </article>
+  </main>
+</body>
+</html>

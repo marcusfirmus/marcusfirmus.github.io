@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="utf-8">
+  <meta name="generator" content="pandoc">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <meta name="author" content="Marcus Firmus">
+  <title>Akolada</title>
+  <style>
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    span.underline{text-decoration: underline;}
+    div.column{display: inline-block; vertical-align: top; width: 50%;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    ul.task-list{list-style: none;}
+  </style>
+  <link rel="stylesheet" href="../static/css/styles.css">
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code&display=swap" rel="stylesheet">
+</head>
+<body>
+  <header id="title-block-header">
+    <h1 class="title">Akolada</h1>
+            <p class="return-link"><a href="../index.html"><b>◅</b> &nbsp; powrót do strony głównej</a></p>
+      </header>
+<main role="main">
+  <article>
+    <h2 id="akolada">Akolada</h2>
+    <p>Eksperymentując z komputerowymi sposobami tworzenia (pisania) muzyki, na próżno szukałem wymarzonego, odpowiedniego dla mnie narzędzia.</p>
+    <p>Moje ulubione środowisko pracy to pliki tekstowe, bash, vim, linux. Pełnoekranowe systemy graficzne (w stylu <strong>MuseScore</strong> i jego bardziej profesjonalnych krewnych) nie są dla mnie odpowiednie. Myszka może się pośliznąć, nie widać wszystkich szczegółów, łatwo utknąć, nie działa diff, nie da się kopiować i wklejać - jednym słowem - nie da się pracować jak porządny programista.</p>
+    <p>Z drugiej strony <strong>csound</strong>, <strong>lilypond</strong> i tego typu narzędzia są potwornie niewygodne dla muzyka. Gdzie są nuty ?! <strong>Chcę je widzieć!</strong></p>
+    <p>Chciałem znaleźć (lub napisać, w końcu okazało się, że <strong>muszę napisać</strong>) program, w którym <strong>“Wlazł Kotek”</strong> wygląda prawie jak na <strong>pięciolinii</strong> :</p>
+    <pre><code>           &gt;     &gt;     &gt;     &gt;     &gt;     &gt;
+               O=            O== O=
+               +-----O=----+-----+-----O=----+-----
+               | O O        O      O O        O
+               +-----+-O O +-----+-----+-O O +-----
+               |           O                 O O==.
+               +-----+-----+-----+-----+-----+-----
+               |
+        G:     +-----+-----+-----+-----+-----+-----
+               |
+               +-----+-----+-----+-----+-----+-----</code></pre>
+    <h2 id="prototyp">Prototyp</h2>
+    <p>Zrobiłem to. Prototyp już istnieje, nazywa się <strong>improviso</strong>, niedługo go pokażę. Potrafi wczytać zapis podobny do powyższego i wygenerować plik MIDI. Po zrenderowaniu za pomocą <strong><a href="https://www.fluidsynth.org">FluidSynth</a></strong> powstaje zaskakująco dobry kawałek!</p>
+    <p>Prototyp działa, a <strong>Akolada</strong> będzie gotowym produktem, <strong>językiem w wersji 1.0</strong>. Na razie jest w fazie opracowywania szczegółów. Dzielę się tutaj przemyśleniami i planami, bo nie wiadomo, kiedy gotowy produkt powstanie. Dla porządku spisałem je po kolei:</p>
+    <h2 id="cele">Cele</h2>
+    <ol type="1">
+    <li><p><strong>Akolada to język, a nie GUI</strong><br />
+    Akolada działa w <strong>trybie wsadowym</strong>. Jej implementacja wzorcowa będzie pracować jak klasyczny <strong>kompilator</strong>, bez interaktywnych interfejsów graficznych, ale z precyzyjną diagnostyką błędów.</p></li>
+    <li><p><strong>Zamkniętość wersji 1.0 – brak założeń o przyszłej kompatybilności</strong><br />
+    Pierwsza wersja <strong>nie będzie rozwijana</strong> w sposób wstecznie kompatybilny. Jeśli projekt się rozwinie, kolejne wersje powstaną jako <strong>odrębne inicjatywy</strong>, bez konieczności zachowywania zgodności ze wcześniejszym kodem.</p></li>
+    <li><p><strong>Nie ingerujemy w brzmienie – to zadanie syntezatorów MIDI</strong><br />
+    Akolada generuje pliki MIDI, ale <strong>nie definiuje samych brzmień</strong>. Instrumenty General MIDI są wykorzystywane, ale specyfikacja dźwięku zależy od silnika syntezatora, takiego jak <a href="https://www.fluidsynth.org">FluidSynth</a>.</p></li>
+    </ol>
+    <h2 id="założenia-co-do-formy-i-znaczenia-zapisu">Założenia co do formy i znaczenia zapisu</h2>
+    <ol start="4" type="1">
+    <li><p><strong>Czas biegnie poziomo, wysokość dźwięku jest diatoniczna</strong> Akolada odwzorowuje <strong>nutowy zapis muzyczny</strong>, nie <strong>piano-roll</strong>. Rytm jest precyzyjnie określony przez <strong>położenie</strong> nuty w poziomie, a wysokość dźwięku wyrażona w sposób <strong>naturalny dla muzyków</strong>.</p></li>
+    <li><p><strong>Brak pauz i metrum – rytm wynika z pozycji nut</strong><br />
+    Nie używamy zapisu pauz ani metrum—wszystko wynika z <strong>poziomego układu znaków</strong>. Takt wyłania się z organizacji zapisu, ale nie jest narzucony jako oddzielna struktura.</p></li>
+    <li><p><strong>Programowalne symbole dla instrumentów i dźwięków</strong><br />
+    Każdy znak w Akoladzie może odpowiadać konkretnej <strong>nutce</strong> lub <strong>uderzeniu perkusyjnemu</strong>, przypisanej do wybranego instrumentu. System <strong>modyfikatorów</strong> pozwala na definiowanie akcentów, artykulacji, obwiedni dźwięku i efektów.</p></li>
+    <li><p><strong>Modyfikatory kontrolują wysokość, dynamikę i czas trwania</strong><br />
+    Akolada pozwala na <strong>płynne zmiany</strong> parametrów dźwięku w czasie. Możemy programować <strong>wibrato, glissanda, akcenty, legato</strong>, a nawet losowe wariacje długości i siły dźwięku.</p></li>
+    </ol>
+    <h2 id="co-dalej">Co dalej</h2>
+    <p>Zamierzam stopniowo rozwijać ten pomysł, chwaląc się tutaj postępami. Zacznę od dokładnego zdefiniowania koncepcji. Najpierw definicja języka, potem implementacja.</p>
+  </article>
+      <p class="return-link"><a href="../index.html"><b>◅</b> &nbsp; powrót do strony głównej</a></p>
+  </main>
+</body>
+</html>

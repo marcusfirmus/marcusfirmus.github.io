@@ -1,0 +1,156 @@
+/* Ogólne ustawienia */
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+
+    max-width: 1200px;
+    margin: 40px auto;
+    padding: 20px;
+    background-color: #f9f9f9;
+    color: #122;
+    font-size: 19px;
+    line-height: 1.7;
+}
+
+main {
+    max-width: 100%;
+    width: 90vw; /* Zajmuje 90% szerokości ekranu */
+    margin: 0 auto; /* Centrowanie */
+    padding: 20px;
+}
+
+article {
+    text-align: justify;
+    hyphens: auto;
+    background: #fff;
+    border-radius: 5px;
+    box-shadow: 0px 2px 5px rgba(0,0,0,0.1);
+    padding: 20px;
+}
+
+/* Nagłówki */
+h1 {
+    text-align: center;
+    color: #0077cc;
+}
+
+h2 {
+    border-bottom: 2px solid #ddd;
+    padding-bottom: 5px;
+}
+
+.subtitle {
+    text-align: center;
+    font-size: 24px;
+
+    /* Zmienione style: */
+    color: #200;
+    font-weight: bold; /* Ustawia czcionkę na pogrubioną (równoważne z 700) */
+    /* Jeśli "bold" to za grubo, możesz spróbować font-weight: 600; */
+
+    margin-top: -10px; /* Na razie zostawiamy margines, zmienimy go w następnym kroku */
+    margin-bottom: 20px; /* Na razie zostawiamy margines */
+}
+
+/* Linki */
+a {
+    color: #0077cc;
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+/* Cytaty */
+/* Resetuj domyślne marginesy dla paragrafów Wewnątrz blockquote */
+/* Domyślnie <p> ma margin-top i margin-bottom, co może tworzyć niechciane odstępy */
+blockquote p {
+    margin-top: 0;
+    font-size: 0.95em;
+    margin-bottom: 1em; /* Zachowaj odstęp między paragrafami, jeśli cytat ma wiele <p> */
+    /* Ostatni paragraf (źródło) nadpisze margin-bottom na 0 */
+
+    color: #004;
+}
+
+/* Style dla ostatniego paragrafu w blockquote (zakładamy, że to źródło) */
+blockquote p:last-child {
+    font-style: normal; /* Usuń kursywę dla źródła */
+    text-align: right; /* Wyrównaj źródło do prawej */
+    margin-top: 10px; /* Dodaj odstęp między treścią cytatu a źródłem */
+    margin-bottom: 0; /* Usuń dolny margines źródła */
+    font-size: 0.9em; /* Opcjonalnie: Trochę mniejsza czcionka niż domyślna w blockquote */
+    color: #007; /* Opcjonalnie: Nieco jaśniejszy/mniej rzucający się w oczy kolor niż główny tekst cytatu */
+}
+
+/* Stopka */
+footer {
+    text-align: center;
+    margin-top: 50px;
+    font-size: 0.9em;
+    color: #666;
+}
+
+code, pre {
+    /*font-family: "Fira Code", SFMono-Regular, Consolas, "Liberation Mono", Menlo, Courier, monospace;*/
+    font-family: Consolas, monospace;
+    white-space: pre !important; /* Wymuszenie zachowania oryginalnej struktury */
+    overflow-x: auto; /* Dodanie przewijania poziomego */
+    word-wrap: normal; /* Zapobiega łamaniu linii */
+    line-height: 1; /* Zmniejszenie odstępu między liniami */
+}
+
+pre {
+    background-color: #f4f4f4;
+    padding: 10px;
+    border-radius: 5px;
+    max-width: 100%; /* Zapobiega wychodzeniu poza ekran */
+    white-space: pre; /* Utrzymuje oryginalne odstępy i układ (można usunąć, bo jest w code, pre) */
+    word-wrap: normal; /* Zapobiega łamaniu linii (można usunąć, bo jest w code, pre) */
+}
+
+/* Kod inline (<code>) */
+code {
+    background-color: inherit; /* Usuwa problem z oddzielnym tłem */
+    padding: 2px 4px;
+    border-radius: 3px;
+    font-size: 15px;
+}
+
+/* Zmniejszenie czcionki i dopasowanie szerokości dla urządzeń mobilnych */
+@media (max-width: 768px) {
+    body {
+        font-size: 16px; /* Mniejsza czcionka dla telefonów */
+        padding: 0 10px;
+    }
+
+    main {
+        width: 100%;
+        padding: 0; /* Minimalne marginesy */
+    }
+
+    article {
+        padding: 10px 5px; /* Mniejszy padding wewnętrzny */
+        border-radius: 3px; /* Delikatniejsze zaokrąglenia */
+        box-shadow: none; /* Usunięcie cienia dla bardziej płaskiego wyglądu */
+    }
+
+    blockquote {
+        margin: 5px 5px;
+    }
+}
+
+.return-link {
+    display: block;
+    text-align: left;
+    margin: 20px 20px;
+    font-size: 1.2em;
+}
+
+img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+    margin: auto;
+}
+

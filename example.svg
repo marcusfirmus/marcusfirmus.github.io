@@ -1,0 +1,55 @@
+<svg width="500" height="300" xmlns="http://www.w3.org/2000/svg">
+  <!-- Osie -->
+  <line x1="40" y1="260" x2="480" y2="260" stroke="#333" stroke-width="2"/>
+  <line x1="40" y1="20" x2="40" y2="260" stroke="#333" stroke-width="2"/>
+  
+  <!-- Wykres equity -->
+  <polyline fill="none" stroke="#0074d9" stroke-width="3" points="
+    50,240
+    70,235
+    90,225
+    110,230
+    130,220
+    150,210
+    170,215
+    190,200
+    210,195
+    230,185
+    250,190
+    270,175
+    290,180
+    310,160
+    330,155
+    350,140
+    370,145
+    390,130
+    410,135
+    430,120
+    450,110
+  " />
+
+  <!-- Punkty danych -->
+  <circle cx="50"  cy="240" r="3" fill="#0074d9"/>
+  <circle cx="70"  cy="235" r="3" fill="#0074d9"/>
+  <circle cx="90"  cy="225" r="3" fill="#0074d9"/>
+  <circle cx="110" cy="230" r="3" fill="#0074d9"/>
+  <circle cx="130" cy="220" r="3" fill="#0074d9"/>
+  <circle cx="150" cy="210" r="3" fill="#0074d9"/>
+  <circle cx="170" cy="215" r="3" fill="#0074d9"/>
+  <circle cx="190" cy="200" r="3" fill="#0074d9"/>
+  <circle cx="210" cy="195" r="3" fill="#0074d9"/>
+  <circle cx="230" cy="185" r="3" fill="#0074d9"/>
+  <circle cx="250" cy="190" r="3" fill="#0074d9"/>
+  <circle cx="270" cy="175" r="3" fill="#0074d9"/>
+  <circle cx="290" cy="180" r="3" fill="#0074d9"/>
+  <circle cx="310" cy="160" r="3" fill="#0074d9"/>
+  <circle cx="330" cy="155" r="3" fill="#0074d9"/>
+  <circle cx="350" cy="140" r="3" fill="#0074d9"/>
+  <circle cx="370" cy="145" r="3" fill="#0074d9"/>
+  <circle cx="390" cy="130" r="3" fill="#0074d9"/>
+  <circle cx="410" cy="135" r="3" fill="#0074d9"/>
+  <circle cx="430" cy="120" r="3" fill="#0074d9"/>
+  <circle cx="450" cy="110" r="3" fill="#0074d9"/>
+</svg>
+
+

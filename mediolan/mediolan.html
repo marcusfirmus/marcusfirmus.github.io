@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="utf-8">
+  <meta name="generator" content="pandoc">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <meta name="author" content="Marcus Firmus">
+  <title>Mediolan - idealna alokacja</title>
+  <style>
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    span.underline{text-decoration: underline;}
+    div.column{display: inline-block; vertical-align: top; width: 50%;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    ul.task-list{list-style: none;}
+  </style>
+  <link rel="stylesheet" href="../static/css/styles.css">
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code&display=swap" rel="stylesheet">
+</head>
+<body>
+  <header id="title-block-header">
+    <h1 class="title">Mediolan - idealna alokacja</h1>
+            <p class="return-link"><a href="../index.html"><b>◅</b> &nbsp; powrót do strony głównej</a></p>
+      </header>
+<main role="main">
+  <article>
+    <h2 id="alokacja-pamięci.-cel">Alokacja pamięci. Cel</h2>
+    <p>Języki programowania pozostają w napięciu pomiędzy łatwością użycia (przez programistę) a sprawnością gotowego kodu.</p>
+    <p>Zacząłem się kiedyś zastanawiać, czy nie da się inaczej podejść do zagadnienia alokacji pamięci. Znaleźć <strong>trzecią drogę</strong>.</p>
+    <p>Trzecia droga miałaby polegać na tym, żeby nie alokować pamięci automatycznie (co się wiąże z użyciem <em>garbage collectora</em>), ale też nie zmuszać programisty do zarządzania tymi sprawami (<strong>precz z <em>malloc</em> i z <em>new</em>!</strong>).</p>
+    <p>Czy kompilator nie mógłby na drodze precyzyjnej statycznej analizy kodu całkowicie skutecznie rozplanować użycia pamięci <strong>we właściwy sposób</strong>? Program wiedziałby gdzie i kiedy co zapisywać, a gdy niepotrzebne, po prostu zostawić, porzucić, a pamięć wykorzystać…</p>
+    <p>Zacząłem eksperymentować i myśleć. Najpierw powstał język poziomu wyższego niż <strong>C</strong>, coś podobnego do <strong>ML</strong>. Badałem możliwości analizy. Na początku nie powstawała żadna implementacja, potrzebna była teoria. Zapisałem wiele papieru - dosłownie parę zeszytów (piórem, fizycznie!).</p>
+    <h2 id="jak-ograniczyć-mediolan-żeby-zaprowadził-nas-do-celu">Jak ograniczyć Mediolan, żeby zaprowadził nas do celu</h2>
+    <p>Język, który jest nośnikiem moich eksperymentów ma różne formy, ale jedną nazwę - <em>Mediolan</em>. Z biegiem czasu okazało się, że trzeba go przykroić. Zamiast algebraicznych typów danych rozpatruję dane proste - jak w Lispie. Mam więc “wielką trójkę”: <strong>car</strong>, <strong>cdr</strong>, <strong>cons</strong>. Z tego buduję cały świat, ścieżki alokacji, warunki użycia, <em>Data Flow Analysis</em>, zbieżność analizy, w końcu - to, co z tego wychodzi - <strong>alokację regionami</strong>.</p>
+    <p>Wszystkie dane są <strong>niemutowalne</strong>, nie ma też domknięć, ani typów polimorficznych. Dlatego też da się sprowadzić program do jednego bloku <em>inline</em>, a potem rozplanować wszystko od początku do końca.</p>
+    <p>Podobną ścieżką podążają autorzy kompilatora <a href="http://www.mlton.org"><strong>MLTon</strong></a>. Podobieństwo podejść jest duże, niemniej u mnie narracja rozwija się w inną stronę. Ostatecznie mam zamiar znaleźć sposoby na znaczące usprawnienie mechanizmów alokacji.</p>
+    <p>O tym wszystkim chcę pisać - po kolei, zaczynając od ogółu, przechodząc po kolei do szczegółów.</p>
+    <h2 id="kogo-zapraszam">Kogo zapraszam</h2>
+    <p>Na pewno nie są to tematy interesujące wszystkich. Przyznaję, że nie jestem naukowcem, tylko zwykłym programistą, który lubi drążyć istotne tematy. Pytanie o <strong>idealny kompilator</strong> - jest jedną ze spraw które zaprzątają umysły. Każdy, kto próbuje zaimplementować interpreter, czy transpiler, w końcu myśli na ten temat. Jest on wielkim marzeniem, dalekosiężnym (a nie - nieosiągalnym) celem.</p>
+    <p>Przeczuwam, że każdy programista może skorzystać z tych pomysłów i ustaleń, niezależnie od tego, na ile kompletne będą moje opisy.</p>
+  </article>
+      <p class="return-link"><a href="../index.html"><b>◅</b> &nbsp; powrót do strony głównej</a></p>
+  </main>
+</body>
+</html>
