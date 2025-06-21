@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="utf-8">
+  <meta name="generator" content="pandoc">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <meta name="author" content="Marcus Firmus">
+  <title>Akolada - prototyp (improvviso)</title>
+  <style>
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    span.underline{text-decoration: underline;}
+    div.column{display: inline-block; vertical-align: top; width: 50%;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    ul.task-list{list-style: none;}
+  </style>
+  <link rel="stylesheet" href="../static/css/styles.css">
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code&display=swap" rel="stylesheet">
+</head>
+<body>
+  <header id="title-block-header">
+    <h1 class="title">Akolada - prototyp (improvviso)</h1>
+            <p class="return-link"><a href="../index.html"><b>◅</b> &nbsp; powrót do strony głównej</a></p>
+      </header>
+<main role="main">
+  <article>
+    <h2 id="akolada-część-2-prototyp">Akolada, część 2 (prototyp)</h2>
+    <p>W <a href="akolada.html">poprzednim artykule</a> przedstawiłem zarys pomysłu na <strong>Akoladę</strong>, język opisu muzyki. Koncepcja jest ciekawa i obiecująca. Jednak oczywiście najlepiej zobaczyć ją w działaniu, obejrzeć coś gotowego. A raczej - posłuchać czegoś gotowego.</p>
+    <h3 id="prototyp">Prototyp</h3>
+    <p>Prototyp istnieje. Nazywa się <strong>improvviso</strong> i jest dostępny na GitHubie: <a href="https://github.com/marcusfirmus/akolada/tree/main/prototype">https://github.com/marcusfirmus/akolada/tree/main/prototype</a>.</p>
+    <p>Co prawda nie jest to jeszcze pełna wersja języka <strong>Akolada</strong>, ale jest to jak najbardziej funkcjonalna implementacja. Może służyć jako <strong>proof of concept</strong>, jako przykład, jako motywacja.</p>
+    <p>Załączony tam w podkatalogu <code>examples/</code> utwór <strong>whole.imp</strong>, powstał w ramach testowania kodu, w trakcie pisania. Dodawałem kolejne elementy, kolejne funkcje, aż w końcu powstał - jak już pisałem w <a href="akolada.html">poprzednim odcinku</a> - całkiem <em>fajny kawałek</em>:</p>
+    <p><audio controls preload="none" > <source src="assets/music/whole.mp3" type="audio/mpeg" > Twoja przeglądarka nie obsługuje elementu audio. </audio></p>
+    <p>To, w jaki sposób powstawała ta muzyka, tłumaczy <strong>dziką</strong> formę, a także niedopracowanie szczegółów utworu. Jest to zapis radości, która ogarniała programistę budującego instrument muzyczny.</p>
+    <p>Załączam również plik <code>MIDI</code>, który jest wynikiem działania <code>improvviso</code>: <a href="assets/music/whole.mid">whole.mid</a>. MIDI jest produktem <code>improvviso</code>, ale warstwa brzmieniowa (obecna w <code>mp3</code>) jest już wynikiem zastosowania <strong>fluidsynth</strong>. Jak się używa tego <em>toolchaina</em> - widać w załączonym w repozytorium <code>Makefile</code>.</p>
+    <p>Jak wygląda kod, o którym mówimy? Poniżej fragment, który pozwala sobie wyobrazić, <strong>jak się z tym pracuje</strong>. Solówka perkusyjna to ciągi <code>yymm...</code> i <code>y y m m ...</code>, a zygzaki cyferek <code>1</code> to solówki melodyczne ;-) Sama radość. <strong>Jam przy klawiaturze …</strong></p>
+    <pre class="improvviso"><code>
+    r: ins=56, type=percussion, velo={100-127}, duration=1.2
+    N: type=melo, chan=4, instr=32, velo={75-110}, dura=1.7
+
+    +---+---+---+---+---+---+---+---
+    F_         
+                           
+                               
+                        1
+                              4
+     
+    c       C   c               C                           
+    2   B 2             B 2    
+                               bB
+     
+                             
+    ymmymymmymyymmmmyyyymmmymymmmyym
+
+                               
+    W                    
+                            b   E
+               
+                        Q     Q   
+
+                         
+
+          W E         
+    +END
+
+    +---+---+---+---+---+---+---+---
+                  1 1
+                     1     
+                 1          1  
+    1          1      1 1     1
+     1      1          1 1    1
+                                1
+    c 1     1   c         1     C1                          
+    2  11 1             B 2    
+         1                     bB
+                          1
+                             
+    y y y y y y y m m m m m m m m m 
+
+                               
+    W                    
+                            b   E
+               
+                        Q     Q   
+
+    D   D   D   D   D   D   D   D
+
+          W E         
+    +END</code></pre>
+    <h2 id="co-dalej">Co dalej?</h2>
+    <p>W kolejnych odcinkach przedstawię problemy jakie pojawiły się podczas pisania <code>improvviso</code> (może słowo <em>problemy</em> nie jest tu na miejscu, chodzi o pewne <strong>decyzje, które trzeba podjąć</strong>, a nie do końca wiadomo od razu - w którą stronę iść).</p>
+    <p><strong>Akolada</strong> powstaje w stylu ekstremalnym, nie będę jej projektować odgórnie. To, co mam gotowe do tej pory, powstało właśnie tak - w wyniku eksperymentów - <code>improvviso</code> jest tego śladem, zapisem i efektem.</p>
+    <p>Dalszy ciąg nastąpi.</p>
+  </article>
+      <p class="return-link"><a href="../index.html"><b>◅</b> &nbsp; powrót do strony głównej</a></p>
+  </main>
+</body>
+</html>
