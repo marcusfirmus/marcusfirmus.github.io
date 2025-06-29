@@ -27,6 +27,16 @@ article {
     padding: 20px;
 }
 
+table {
+        border-collapse: collapse;
+}
+
+table td,
+table th {
+        padding: 4px 12px;
+        border: 1px solid #ddd;
+}
+
 /* Nagłówki */
 h1 {
     text-align: center;

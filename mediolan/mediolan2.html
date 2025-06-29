@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="utf-8">
+  <meta name="generator" content="pandoc">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <meta name="author" content="Marcus Firmus">
+  <title>Mediolan - idealna alokacja, benchmark jako proof of concept</title>
+  <style>
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    span.underline{text-decoration: underline;}
+    div.column{display: inline-block; vertical-align: top; width: 50%;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    ul.task-list{list-style: none;}
+  </style>
+  <link rel="stylesheet" href="../static/css/styles.css">
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code&display=swap" rel="stylesheet">
+</head>
+<body>
+  <header id="title-block-header">
+    <h1 class="title">Mediolan - idealna alokacja, benchmark jako proof of concept</h1>
+            <p class="return-link"><a href="../index.html"><b>◅</b> &nbsp; powrót do strony głównej</a></p>
+      </header>
+<main role="main">
+  <article>
+    <h2 id="lepsza-alokacja-jako-cel">Lepsza alokacja jako cel</h2>
+    <p>W <a href="mediolan.html">poprzednim artykule</a> zapowiedziałem prezentację wysiłków w kierunku opracowania autorskich metod alokacji pamięci. Metody mają być oparte o statyczną analizę kodu, a wszystko w ramach budowy kompilatora własnego eksperymentalnego języka <strong>Mediolan</strong>. Czy jednak <strong>gra jest warta świeczki</strong>? Czy warto rozwijać skomplikowaną teorię po to, żeby uzyskać mityczne usprawnienie kodu? W dzisiejszym artykule postaram się odpowiedzieć na to pytanie, prezentując eksperymenty, które doprowadziły mnie do <strong>silnego przekonania</strong>, że tak jest.</p>
+    <p>Nie skupiam się na warstwie składniowej, zakładając, że techniki, które tu opisuję będą miały zastosowanie w językach wysokiego poziomu opartych o abstrakcyjne typy danych, kontrolę sterowania przez dopasowywanie wzorców i programowanie funkcji rekurencyjnych. W duchu <strong>ML</strong>, a współcześniej - <strong>Haskella</strong>, <strong>Scali</strong>. <strong>Pythoniści</strong> powinni też wiedzieć o czym mówię, przytulili te idee parę lat temu, w <strong>Pythonie</strong> mamy też <code>match/case</code>.</p>
+    <p>Takie języki mają <strong>konstruktory</strong> i <strong>dekonstruktory</strong>, to jest bardzo wygodne, ale wymaga dynamicznej alokacji. Jeśli sprowadzić to do operacji podstawowych, możemy myśleć o lispowej trójce <code>car</code>/<code>cdr</code>/<code>cons</code>, jako o <strong>minimalnym modelu</strong> takiego zestawu.</p>
+    <p>Żeby zobaczyć, na ile alokacja pamięci na zasadzie „bierz i zapomnij” może być szybsza chociażby od nowocześnie zaimplementowanego zliczania referencji, napisałem mały kawałek kodu, implementujący te trzy - właśnie <code>car</code>/<code>cdr</code>/<code>cons</code> - na dwa sposoby: za pomocą alokowania przez <code>std::shared_ptr</code> - co odpowiada zliczaniu referencji, oraz - za pomocą pobierania pamięci z nieskończonego („mentalnie!”) bufora.</p>
+    <h2 id="kod">Kod</h2>
+    <p>Kod jest dość prosty. Funkcja <code>cons</code> odpowiada tutaj konstruktorowi, który z dwóch obiektów tworzy <strong>parę</strong>. <code>car</code> i <code>cdr</code> pobierają odpowiednio pierwszy - i drugi element. Sama trójka <code>car/cdr/cons</code> nie wystarczy, żeby pisać jakiekolwiek programy, trzeba jeszcze móc operować na tych danych, pobierać je, czytać, wypisywać. Dodajemy więc założenie, że naszymi <strong>atomami</strong> są zawsze liczby <code>int</code> (będziemy mogli je wypisywać, sortować, ale także dostaniemy za darmo arytmetykę), a dodatkowe operacje, których potrzebujemy to sprawdzenie danych (<code>is_cons</code>) i pobranie (<code>get_atom</code>).</p>
+    <p>To wszystko, czego potrzebujemy, żeby pisać proste benchmarki:</p>
+    <ul>
+    <li>Typ <code>data</code>, który będzie różnie wyglądał w zależności od tego, jak zaimplementujemy benchmark</li>
+    <li><code>data  car( const data&amp; )</code></li>
+    <li><code>data  cdr( const data&amp; )</code></li>
+    <li><code>data  cons(const data&amp;, const data&amp;)</code></li>
+    <li><code>int get_atom(const data&amp; x)</code></li>
+    <li><code>bool is_cons(const data&amp; x)</code></li>
+    </ul>
+    <p>Dwojaka implementacja opiera się - po pierwsze na <code>std::shared_ptr</code>:</p>
+    <pre class="cplusplus"><code>struct data {
+        using ptr = std::shared_ptr&lt;std::pair&lt;data, data&gt;&gt;;
+        std::variant&lt;ptr, int&gt; value;
+        
+        data(int x) : value(x) {}
+        data(const data&amp; x, const data&amp; y) : value(std::make_shared&lt;std::pair&lt;data, data&gt;&gt;(x, y)) {};
+    };
+
+    data cons(const data&amp; x, const data&amp; y)
+    {
+        return data(x, y); // Wywołuje konstruktor pary
+    }</code></pre>
+    <p>a po drugie na unii:</p>
+    <pre class="cplusplus"><code>struct data {
+        int  type_tag;
+        
+        union {
+            int  i;
+            data *ptr;
+        }  value;
+        
+        data() = default;
+        data( int x ): type_tag(0) { value.i = x; };
+    };
+
+    data      pseudo_heap[ 12000000 ];
+    data     *first_free = pseudo_heap;
+
+    data  *alloc_new()
+    {
+        data  *result = first_free;
+        first_free += 2;
+        return  result;
+    }
+
+    data cons( const data&amp; x, const data&amp; y )
+    {
+        data  result;
+        result.type_tag = 1;
+        result.value.ptr = alloc_new();
+        result.value.ptr[ 0 ] = x;
+        result.value.ptr[ 1 ] = y;
+        return  result;
+    }</code></pre>
+    <p>Gdy już mamy te mechanizmy, można przystąpić do porównania szybkości ich działania, przykładowo odwracając listę. Stosowałem taki oto przykład:</p>
+    <pre class="cplusplus"><code>//  Rekursywna funkcja budująca długą listę
+    data  mklist( data len, data acc )
+    {
+        if ( get_atom(len) == 0 )
+            return  acc;
+                       
+        data  next = get_atom(len) - 1;
+        data  acc1 = cons( next, acc );
+        return  mklist( next, acc1 );
+    }
+
+    //  Rekursywna funkcja odwracająca listę - pomocnicza funkcja
+    data  reverse_helper( data list, data acc )
+    {
+        if ( !is_cons(list) )
+            return  acc;
+        return  reverse_helper( cdr(list), cons(car(list), acc) );
+    }
+
+    //  Funkcja odwracająca listę
+    data  reverse( data list )
+    {
+        return  reverse_helper( list, 0 );
+    }
+
+    int main()
+    {
+        data list = mklist( 160, 0 );
+
+        for ( int i=0; i&lt;20001; i++ ) 
+            list = reverse( list );
+
+        std::cout &lt;&lt; show(list) &lt;&lt; &#39;\n&#39;;
+
+        std::cout &lt;&lt; first_free - pseudo_heap &lt;&lt; &#39;\n&#39;;
+        return 0;
+    }</code></pre>
+    <p>To tylko tyle - i aż tyle.</p>
+    <h2 id="pierwsze-wyniki">Pierwsze wyniki</h2>
+    <p>Po skompilowaniu w trybie <code>g++ -O4</code> otrzymujemy dwukrotne przyspieszenie kodu z „pseudostertą” w stosunku do kodu opartego na nowoczesnych inteligentnych wskaźnikach ze standardowej biblioteki Gnu C++.</p>
+    <p>Czy to dużo, czy mało?</p>
+    <p>Z jednej strony - marzymy o jeszcze większym przyroście! Przecież zliczanie referencji to niekoniecznie najnowocześniejsza strategia alokacji pamięci.</p>
+    <p>Ale - dużo mniej niż dwukrotny „kop” to jest coś, o co często właśnie walczy się podczas tuningu mechanizmów kompilacji.</p>
+    <p>Niepokoił mnie jednak ten wynik, intuicyjnie odbierałem go jako <strong>zbyt słaby</strong>. Postanowiłem się więc przyjrzeć dokładniej metodzie badań i znaczeniu liczb, które się tu pojawiły. Do pomiaru używałem systemowego narzędzia <code>time</code>, które pokazuje zużycie czasu w podziale na czas systemowy i czas w przestrzeni użytkownika:</p>
+    <table>
+    <thead>
+    <tr class="header">
+    <th>Czas</th>
+    <th>Pseudosterta (z resetem)</th>
+    <th>std::shared_ptr</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr class="odd">
+    <td>real</td>
+    <td><strong>0m0,087s</strong></td>
+    <td><strong>0m0,151s</strong></td>
+    </tr>
+    <tr class="even">
+    <td>user</td>
+    <td>0m0,033s</td>
+    <td>0m0,147s</td>
+    </tr>
+    <tr class="odd">
+    <td>sys</td>
+    <td>0m0,054s</td>
+    <td>0m0,004s</td>
+    </tr>
+    </tbody>
+    </table>
+    <p>Co prawda mamy widoczny zysk <strong>73.5% rzeczywistego czasu</strong>, ale dlaczego czas systemowy jest gorszy ?</p>
+    <h2 id="poprawka">Poprawka !</h2>
+    <p>Po chwili zastanowienia (i po przedyskutowaniu sprawy z <strong><code>Gemini</code></strong>, a jakże), doszedłem do wniosku, że moja <strong>ogromna tablica</strong>, alokowana na zapas, jako właśnie ta „pseudosterta” stanowi pewien problem dla systemu, bo - <strong>po prostu</strong> - musi ją zaalokować. Co prawda tylko raz, ale - pomyślałem - skonstruujmy ten benchmark inaczej, <strong>dajmy mu szanse!</strong>.</p>
+    <p>Wprowadziłem więc szybko następującą zmianę:</p>
+    <pre><code>int main()
+    {
+        data list = 0;
+
+        for ( int i=0; i&lt;41; i++ ) 
+        {       
+            list = mklist( 160, 0 );
+
+            for ( int i=0; i&lt;20001; i++ ) 
+                list = reverse( list );
+
+            //  Oszustwo, żeby udawać nieskończenie wielką pamięć ...
+            //  W rzeczywistości, w prawdziwym &quot;Mediolanie&quot; będzie to odpowiadać 
+            //  resetowaniu regionów.
+            first_free = pseudo_heap;
+        }
+
+        std::cout &lt;&lt; show(list) &lt;&lt; &#39;\n&#39;;
+        return 0;
+    }
+    </code></pre>
+    <p>Zmiana powinna pomóc – myślałem – pamięć nie będzie alokowana w tak wielkim kawałku, nie wymaga to dostępu do wielu stron pamięci systemowej, będzie szybsze.</p>
+    <p>Nie pomyliłem się. Wyniki były wyraźnie lepsze:</p>
+    <table>
+    <thead>
+    <tr class="header">
+    <th>Czas</th>
+    <th>Pseudosterta (z resetem)</th>
+    <th>std::shared_ptr</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr class="odd">
+    <td>real</td>
+    <td><strong>0m0,711s</strong></td>
+    <td><strong>0m5,491s</strong></td>
+    </tr>
+    <tr class="even">
+    <td>user</td>
+    <td>0m0,661s</td>
+    <td>0m5,487s</td>
+    </tr>
+    <tr class="odd">
+    <td>sys</td>
+    <td>0m0,050s</td>
+    <td>0m0,004s</td>
+    </tr>
+    </tbody>
+    </table>
+    <p>Teraz zysk jest już <strong>imponujący</strong> i wynosi <strong>673% czasu rzeczywistego</strong>. Niemal <strong>siedmiokrotne przyspieszenie</strong>. Odetchnąłem szczęśliwy - <strong>warto to dalej badać!</strong>.</p>
+    <h2 id="interpretacja-i-wnioski">Interpretacja i wnioski</h2>
+    <p>Gigantyczna różnica czasu alokacji wynika z narzutu, jaki jest potrzebny dla <code>std::shared_ptr</code> przy inkrementowaniu liczników i sprawdzaniu ich oraz oczywiście przy alokacji i dealokacji małych kawałków pamięci. Tego właśnie oczekiwaliśmy.</p>
+    <p>Z kolei wersja z „pseudostertą”, czyli <em>bump-pointer</em> alokuje pamięć dużym blokiem, robi to rzadziej, a operacja pojedynczej alokacji jest superszybka (inkrementacja licznika).</p>
+    <p>Oczywiście czas <strong>systemowy</strong> nadal jest obecny, ale staje się nieistotnym ułamkiem. Zresztą przecież nie da się go uniknąć.</p>
+    <p>Taki styl działania jest <strong>celem</strong> dla <strong>Mediolanu</strong>. Alokacja w <strong>regionach</strong> ma to umożliwić, tutaj mamy tego przedsmak. Żeby to było możliwe, kompilator musi <strong>umieć sam stwierdzić</strong>, jak, kiedy i gdzie <strong>tworzyć i usuwać regiony</strong>. To trudne zagadnienie, ale podejmuję się w dalszym ciągu zaprezentować pomysły teoretyczne, które doprowadzą do tego celu. <strong>Kompilator ma bez udziału programisty zbudować optymalną strategię alokacji regionami</strong>.</p>
+    <h2 id="co-dalej">Co dalej ?</h2>
+    <p>Idziemy więc dalej. Może skonstruowanie bardziej złożonych benchmarków (pomyśl o sortowaniu list!) pokaże jakieś dodatkowe wnioski? A może porównanie tego kodu z odpowiednikiem w <strong>Pythonie</strong>, <strong>Haskellu</strong> (ten jest znakomity jeśli chodzi o wydajność, w dużym stopniu ze względu właśnie na kompilowany kod ze statycznym systemem typów!), w <strong>Clojure</strong> (skoro <code>car/cdr/cons</code>), albo innych <strong>Lispach</strong> ? Może wykonam takie porównania.</p>
+    <p>W kolejnych odcinkach pokażę próby rozszerzenia tych benchmarków na większe algorytmy (jak już mówiłem - myślę o sortowaniu) i na inne języki (<a href="../AI.html"><strong>Roboty</strong></a> są w stanie napisać analogiczny kod w <strong>dowolnym</strong> języku programowania).</p>
+    <p>Będę też prezentować kolejny logiczny krok w toku rozumowania, który prowadzi do statycznej analizy kodu, jakim jest <strong>eliminacja rekurencji</strong>.</p>
+  </article>
+      <p class="return-link"><a href="../index.html"><b>◅</b> &nbsp; powrót do strony głównej</a></p>
+  </main>
+</body>
+</html>
