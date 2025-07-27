@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="utf-8">
+  <meta name="generator" content="pandoc">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <meta name="author" content="Marcus Firmus">
+  <title>Wyściółka szuflady biurka programisty</title>
+  <style>
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    span.underline{text-decoration: underline;}
+    div.column{display: inline-block; vertical-align: top; width: 50%;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    ul.task-list{list-style: none;}
+  </style>
+  <link rel="stylesheet" href="static/css/styles.css">
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code&display=swap" rel="stylesheet">
+</head>
+<body>
+  <header id="title-block-header">
+    <h1 class="title">Wyściółka szuflady biurka programisty</h1>
+          <p class="subtitle">Embeddingi na laptopie</p>
+            <p class="return-link"><a href="index.html"><b>◅</b> &nbsp; powrót do strony głównej</a></p>
+      </header>
+<main role="main">
+  <article>
+    <h2 id="zagadkowe-embeddingi">Zagadkowe embeddingi</h2>
+    <p>Ci, którzy wcześniej nie zetknęli się z technicznymi szczegółami dotyczącymi Modeli Językowych, szybko natrafią na pojęcie <strong>embeddingów</strong>. Jeden z pierwszych istotnych elementów składających się na maszynerię Modeli Językowych - <strong>Embedding</strong> to siłacz, który obok <strong>Mechanizmu Uwagi</strong> stoi za oszałamiającymi sukcesami AI!</p>
+    <p>Przyjrzyjmy się im od strony praktycznej. Czy można w domu, na <strong>małym laptopie z linuxem</strong> użyć tych <strong>embeddingów</strong> do czegokolwiek sensownego? Przynajmniej po to, żeby zobaczyć – <strong>jak działają</strong>?</p>
+    <p>Takie intencje przyświecały mi podczas pierwszych eksperymentów, które chcę tu opisać. Zobaczymy jak można użyć embeddingów z <a href="https://cloud.google.com/ai/generative-ai">API <code>genai</code></a> lub z <a href="https://ollama.com">ollama</a> do trenowania i inferencji za pomocą regresorów i klasyfikatorów ze <a href="https://scikit-learn.org">scikit-learn</a>. To pouczające i inspirujące doświadczenie, które prowadzi do <strong>stu kolejnych pomysłów</strong>, z moim wykluwającym się pomysłem na <strong>„Transformer Dla Ubogich”</strong> na czele (o którym napiszę w przyszłości).</p>
+    <h2 id="skąd-brać-embeddingi">Skąd brać embeddingi?</h2>
+    <p>Na laptopie z linuksem mamy co najmniej dwie proste ścieżki otrzymania embeddingów, zarówno na poziomie wyrazów, jak i dla całych wypowiedzi:</p>
+    <ul>
+    <li>API Modeli Językowych - na przykład <code>genai</code> od Google posiada metody pobierania embeddingów, zarówno pojedynczo, jak w paczkach do 100 sztuk naraz. Nawet w trybie <strong>free tier</strong> model <code>embedding-001</code> potrafi wykonać obliczenia szybko, czasem nawet dla setki tekstów w ciągu sekundy. Jest to podstawowy dostępny model, wyspecjalizowany do liczenia embeddingów - jest tak dzisiaj, gdy to piszę, czyli w lipcu 2025.</li>
+    <li>API <code>ollama</code>. Gdy piszę te słowa, <code>ollama</code> jest całkiem funkcjonalnym systemem - łatwo się instaluje, a na małym laptopie z dowolnym GPU uruchamia małe modele dialogowe wielkości kilku miliardów parametrów. Tym bardziej dostępne są modele embeddingowe, takie jak <code>nomic-embed-text</code>, <code>bg3-m3</code>, <code>paraphrase-multilingual</code>.</li>
+    </ul>
+    <p>Gdy eksperymentujemy, warto sprawdzać różne modele. Niektóre z nich są szybsze, z kolei inne „znają” język polski.</p>
+    <h2 id="stolice-państw-minimalne-zadanie.-proof-of-concept">Stolice Państw – minimalne zadanie. Proof Of Concept</h2>
+    <p>Co można z tym zrobić? Prostym pomysłem, który wpadł mi do głowy, było połączenie embeddingów z „Machine Learning” w lekkiej formie, czyli ze <code>scikit-learn</code>! Wymyśliłem, że sprawdzę wiedzę geograficzną, jaka jest wdrukowana w embeddingi.</p>
+    <p>Przygotowałem kilka przykładów zdań na temat stolic:</p>
+    <table>
+    <thead>
+    <tr class="header">
+    <th>Zdanie</th>
+    <th>Wartość</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr class="odd">
+    <td>Praga jest stolicą Włoch.</td>
+    <td>0</td>
+    </tr>
+    <tr class="even">
+    <td>Rzym jest stolicą Włoch.</td>
+    <td>1</td>
+    </tr>
+    <tr class="odd">
+    <td>Grecja jest stolicą Hagi.</td>
+    <td>0</td>
+    </tr>
+    <tr class="even">
+    <td>Warszawa jest stolicą Polski.</td>
+    <td>1</td>
+    </tr>
+    </tbody>
+    </table>
+    <p>Był to <strong>mikro-korpus</strong>, który następnie przedstawiłem Modelowi Językowemu z prośbą o rozszerzenie do wielkości ok 100. Dostałem w ten sposób <strong>mini-korpus</strong>, który zamieniłem na embeddingi, a następnie, po podzieleniu na zbiór <strong>treningowy</strong> i <strong>testowy</strong> w stosunku 60:40, pokazałem „wyjętemu z pudełka” (czyli bez parametrów, bez tuningu) klasyfikatorowi ze <code>scikit-learn</code>. Próbowałem <code>LogisticRegression</code>, a potem <code>SVC</code>.</p>
+    <p>Najpierw wyniki były słabe: 60% trafności.</p>
+    <p>Przyjrzałem się jednak bliżej i zauważyłem, że pierwszy model embeddingowy, którego użyłem nie był polskojęzyczny! Wynikało to z dokumentacji.</p>
+    <p>Po przejściu na model <code>bg3-m3</code> (wielojęzyczny) i skupieniu się na <code>SVC</code> dostałem <strong>100%</strong> na zbiorze testowym.</p>
+    <p>Radość w obozie zwycięzców panowała do samego rana. <strong>– To działa!</strong> Jeszcze nawet zanim to „rano” nadeszło, pojawiły się nowe pomysły!</p>
+    <h2 id="jak-trenować-systemy-dla-większych-zadań-klej">Jak trenować systemy dla większych zadań? KLEJ!</h2>
+    <p>Zapytałem AI o dostępność benchmarków modeli językowych dla języka polskiego, dowiedziałem się o <a href="https://klejbenchmark.com"><strong>Kompleksowej Liście Ewaluacji Językowych</strong></a> stworzonej przez ludzi z Allegro i AGH (nazwa jest tak dobrana, żeby akronim mógł być odpowiednikiem <a href="https://gluebenchmark.com">GLUE</a>, co z kolei oznacza General Language Understanding Evaluation).</p>
+    <p>Szybko zorientowałem się, że <a href="https://klejbenchmark.com">KLEJ</a> składa się z dziewięciu dobrze określonych zadań, dane treningowe i – częściowo – testowe są dostępne do pobrania i – co dla mnie bardzo ważne – są małe! Kilka tysięcy przykładów na każde zadanie. W sumie - nieco ponad 65000 tekstów. Od razu zrozumiałem że to liczba całkowicie wygodna z punktu widzenia mojego laptopa.</p>
+    <p>Rzeczywiście - obliczenie embeddingów dla tych <strong>wszystkich</strong> tekstów zajęło kilkanaście minut za pomocą modeli <code>embedding-001</code> z <code>genai</code>. Więcej mi zajęło napisanie kodu, który w wygodny sposób cache-uje te embeddingi!</p>
+    <p>Druga rzecz, również bardzo ważna - rodzaj tych zadań <strong>całkowicie</strong> odpowiada moim potrzebom. Są to zadania klasyfikacji (dwie lub kilka etykiet), niektóre tylko <strong>wymagają</strong> regresji, a większość w sensowny sposób może być do regresji sprowadzona, bo etykiety można uporządkować.</p>
+    <p><em>Last but not least</em>, autorzy KLEJ precyzyjnie określili sposób obliczania metryk, jaki stosują przy budowaniu <code>leaderboardu</code>, a więc - moje wyniki mogę bezpośrednio porównywać z „wielkimi”, a z drugiej strony (może to ważniejsze) – z „baseline”.</p>
+    <h2 id="wyniki">Wyniki</h2>
+    <p>Policzywszy to wszystko, porównałem swoje wyniki do dwóch wybranych modeli z <a href="https://klejbenchmark.com/leaderboard/">leaderboardu KLEJ.</a>:</p>
+    <table>
+    <thead>
+    <tr class="header">
+    <th>Zadanie</th>
+    <th>1.</th>
+    <th>2.</th>
+    <th>3.</th>
+    <th>metrics</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr class="odd">
+    <td>NKJP-NER</td>
+    <td>95.8</td>
+    <td>92.7</td>
+    <td>68.53</td>
+    <td>Accuracy</td>
+    </tr>
+    <tr class="even">
+    <td>CDSC-E</td>
+    <td>94.3</td>
+    <td>92.5</td>
+    <td>76.30</td>
+    <td>Spearman corr.</td>
+    </tr>
+    <tr class="odd">
+    <td>CDSC-R</td>
+    <td>95.1</td>
+    <td>91.9</td>
+    <td>44.44</td>
+    <td>Accuracy</td>
+    </tr>
+    <tr class="even">
+    <td>CBD</td>
+    <td>74.3</td>
+    <td>50.3</td>
+    <td>48.97</td>
+    <td>F1</td>
+    </tr>
+    <tr class="odd">
+    <td>PolEmo2.0-IN</td>
+    <td>93.1</td>
+    <td>89.2</td>
+    <td>79.25</td>
+    <td>Accuracy</td>
+    </tr>
+    <tr class="even">
+    <td>PolEmo2.0-OUT</td>
+    <td>84.0</td>
+    <td>76.3</td>
+    <td>46.36</td>
+    <td>Accuracy</td>
+    </tr>
+    <tr class="odd">
+    <td>DYK</td>
+    <td>75.4</td>
+    <td>52.1</td>
+    <td>54.91</td>
+    <td>F1</td>
+    </tr>
+    <tr class="even">
+    <td>PSC</td>
+    <td>98.8</td>
+    <td>95.3</td>
+    <td>85.70</td>
+    <td>F1</td>
+    </tr>
+    <tr class="odd">
+    <td>AR</td>
+    <td>89.2</td>
+    <td>84.5</td>
+    <td>79.76</td>
+    <td>1 - wMAE</td>
+    </tr>
+    <tr class="even">
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    </tr>
+    <tr class="odd">
+    <td>Średnia</td>
+    <td>88.89</td>
+    <td>80.53</td>
+    <td>64.91</td>
+    <td></td>
+    </tr>
+    </tbody>
+    </table>
+    <p>Autorzy zaprojektowali metryki w ten sposób, że można wziąć z nich średnią, bo 100 oznacza “geniusza”, 0 oznacza “antygeniusza”, a 25 oznacza np. “losowy wybór 1 z 4”, czyli – wszystkie skale są podobne, co wynika z zaprojektowania metryk.</p>
+    <p>Moja średnia jest dużo niższa niż tamtych modeli, ale i tak jest niezła, jak na „składak” wykonany z publicznie dostępnych elementów, policzony na laptopie.</p>
+    <h2 id="wnioski">Wnioski</h2>
+    <ol type="1">
+    <li>Całkiem dużo da się zrobić w domu, istnieje wiele ciekawych ścieżek dalszych prób!</li>
+    <li>KLEJ jest świetnym narzędziem <strong>mierzenia</strong> jakości własnych rozwiązań, jeśli dotyczą języka polskiego.</li>
+    </ol>
+    <h2 id="eksplozja-pomysłów.-co-dalej">Eksplozja pomysłów. Co dalej…</h2>
+    <p>W przyszłości myślę o tym, żeby czymś własnym zastąpić embeddingi. Mam kilka ścieżek pomysłów, generalnie polegają na tym, żeby embeddingi dla pojedynczych słów języka polskiego stabelaryzować, a potem jakoś je składać, korzystając ze <a href="https://spacy.io">spaCy</a>, <a href="https://morfeusz.sgjp.pl">Morfeusz2</a> itp, szukać możliwości <strong>kodowania</strong> formy gramatycznej zamiast <strong>pozycji w zdaniu</strong>, co pozwoliłoby wykorzystać specyfikę języka polskiego. Albo - może - trenować podmodele, które za pomocą embeddingów słów będą jakoś konstruować embeddingi fraz.</p>
+    <p>Może cechy języka polskiego, które utrudniają nieco bezpośrednie stosowanie algorytmów powstających w głównym nurcie NLP – są szansą <strong>dla nas</strong>, żeby zbudować coś <strong>specyficznego</strong>, ciekawego, nowatorskiego?</p>
+    <p>W kolejnych odcinkach będę pisać – co udało się zrobić. Zachęcam wszystkich do samodzielnych eksperymentów – to niesamowicie satysfakcjonująca, nowa, obiecująca – i superciekawa dziedzina! <strong>A w domu można wiele uzyskać!</strong>.</p>
+  </article>
+      <p class="return-link"><a href="index.html"><b>◅</b> &nbsp; powrót do strony głównej</a></p>
+  </main>
+</body>
+</html>
