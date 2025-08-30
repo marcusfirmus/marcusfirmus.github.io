@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="utf-8">
+  <meta name="generator" content="pandoc">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <meta name="author" content="Marcus Firmus">
+  <title>Wyściółka szuflady biurka programisty</title>
+  <style>
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    span.underline{text-decoration: underline;}
+    div.column{display: inline-block; vertical-align: top; width: 50%;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    ul.task-list{list-style: none;}
+  </style>
+  <link rel="stylesheet" href="static/css/styles.css">
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code&display=swap" rel="stylesheet">
+</head>
+<body>
+  <header id="title-block-header">
+    <h1 class="title">Wyściółka szuflady biurka programisty</h1>
+          <p class="subtitle">Oceniacz modeli <code>ollama</code></p>
+            <p class="return-link"><a href="index.html"><b>◅</b> &nbsp; powrót do strony głównej</a></p>
+      </header>
+<main role="main">
+  <article>
+    <h2 id="eksperyment-z-ai-oceniacz-trudności-pytań-i-wybór-modelu-w-ollama">Eksperyment z AI: oceniacz trudności pytań i wybór modelu w <code>ollama</code></h2>
+    <p>Moje plany dotyczące projektu <strong>KLEJ</strong> są wciąż rozwijane, ale w międzyczasie przeprowadziłem bardzo ciekawy eksperyment z AI. Poprosiłem model językowy, żeby pomógł mi napisać program, który po podaniu zapytania ocenia jego trudność (na podstawie prostych heurystyk) i następnie wybiera odpowiedni <strong>mały model LLM</strong> (za pomocą <code>ollama</code>), aby wykonać zadanie.</p>
+    <h2 id="idea">Idea</h2>
+    <p>Pomysł był prosty:</p>
+    <ol type="1">
+    <li>Zmierzyć złożoność zapytania (<code>wc</code> – liczba linii, słów, znaków).</li>
+    <li>Na podstawie tych danych użyć lekkiej regresji (np. ze <code>scikit-learn</code>), aby przewidzieć, który model będzie <strong>najlepszy kompromis między jakością a szybkością</strong>.</li>
+    <li>Wykonać zapytanie w <code>ollama</code>, zmierzyć czas i poprosić użytkownika (czyli mnie) o ocenę jakości.</li>
+    <li>Zapisywać dane i retrenować regresor w trybie iteracyjnym.</li>
+    </ol>
+    <p>Brzmi dość abstrakcyjnie? A jednak działa.</p>
+    <h2 id="przebieg-eksperymentu">Przebieg eksperymentu</h2>
+    <p>Całość robiłem w dialogu z modelem <strong>Gemini Flash 2.5</strong>, z którym rozmawiałem przez mój własny program <code>chater.py</code>. Ten program działa w terminalu Linuksa, opiera się na modułach <code>cmd2</code> i <code>rich</code>, więc interakcja wygląda podobnie jak w powłoce systemowej, tylko że z AI.</p>
+    <p>W toku rozmowy poprosiłem model, żeby napisał cały kod. I faktycznie – <strong>od początku do końca powstał działający zestaw skryptów i programów</strong>:</p>
+    <ul>
+    <li><code>regression.py</code> – program w Pythonie, który trenuje regresory i wykonuje predykcje,</li>
+    <li><code>init_train_data.sh</code> – generator wstępnych danych do treningu (z wymyślonymi zadaniami i ocenami jakości),</li>
+    <li><code>ask.sh</code> – główny skrypt użytkownika, który przyjmuje zadanie, przewiduje trudność i wybiera model.</li>
+    </ul>
+    <p>Model nie tylko zaproponował strukturę, ale też poprawiał kod krok po kroku, gdy coś nie działało. Były błędy, były poprawki, była iteracja – czyli dokładnie ten <strong>proces dialogowego, iteracyjnego programowania</strong>, który najbardziej mnie interesował.</p>
+    <h2 id="efekt">Efekt</h2>
+    <p>Ostatecznie powstał system, który faktycznie:</p>
+    <ul>
+    <li>potrafi <strong>ocenić trudność zapytania</strong>,</li>
+    <li><strong>wybrać model</strong> na podstawie przewidywanej jakości i czasu,</li>
+    <li>wykonać zadanie w <code>ollama</code>,</li>
+    <li>zebrać dane o rzeczywistym czasie i jakości,</li>
+    <li>a następnie <strong>sam się douczać</strong> po każdej interakcji.</li>
+    </ul>
+    <p>Czy to praktyczny system produkcyjny? Nie – to raczej <strong>zabawka</strong>. Ale dokładnie o to chodziło: pokazać, jak można w trybie dialogowym stworzyć od zera dość złożony, działający program, w oparciu o prosty opis i kolejne interakcje z AI.</p>
+    <p>Do tego dochodzi aspekt filozoficzny: mój mały laptop, lokalne modele i prosty skrypt – a jednak działa to jak jakiś super-wieloagentowy system. W duchu mojego hasła <strong>„Transformer Dla Ubogich”</strong>.</p>
+    <h2 id="co-dalej">Co dalej?</h2>
+    <p>Eksperyment otworzył mi głowę na kilka nowych pomysłów:</p>
+    <ul>
+    <li>bardziej zaawansowany wybór modelu (np. w zależności od rodzaju zadania),</li>
+    <li>dodanie pamięci i historii,</li>
+    <li>testowanie większej liczby modeli w <code>ollama</code>,</li>
+    <li>może nawet „auto-tuning” kryteriów wyboru.</li>
+    </ul>
+    <p>Zobaczymy, co z tego wyniknie. Na razie cieszę się, że całość udało się doprowadzić do działającego prototypu.</p>
+    <hr />
+    <h2 id="ps">PS</h2>
+    <p>Żeby było ciekawiej – ten artykuł nie został napisany przeze mnie. <strong>Całość napisało AI (ChatGPT)</strong>, na podstawie moich notatek i historii rozmowy z Gemini. Tak więc jest to trochę meta-eksperyment: AI opisuje eksperyment, w którym AI pisało kod 🙂</p>
+    <hr />
+    <h3 id="notatka-od-redaktora-chatgpt">Notatka od redaktora (ChatGPT)</h3>
+    <p>Ten tekst powstał w całości na podstawie materiałów dostarczonych przez Marka – w szczególności pliku <code>oceniacz.yaml</code>, zawierającego historię jego rozmów z modelem Gemini Flash 2.5. Moim zadaniem było ułożenie z tego spójnego artykułu w formacie Markdown, tak aby pasował do jego bloga/programistycznych notatek.</p>
+    <p>Mam nadzieję, że czytelnicy znajdą w tym inspirację – bo nawet „poważne” projekty zaczynają się często od takich zabawkowych prototypów.</p>
+    <h3 id="kod-źródłowy">Kod źródłowy</h3>
+    <p>Całość kodu, który powstał w ramach tego eksperymentu, jest dostępna w moim repozytorium na GitHubie:<br />
+    👉 <a href="https://github.com/marcusfirmus/oceniacz">github.com/marcusfirmus/oceniacz</a></p>
+    <p>Najważniejsze pliki: - <a href="https://github.com/marcusfirmus/oceniacz/blob/main/regression.py"><code>regression.py</code></a> – logika trenowania i predykcji, - <a href="https://github.com/marcusfirmus/oceniacz/blob/main/init_train_data.sh"><code>init_train_data.sh</code></a> – generowanie danych treningowych, - <a href="https://github.com/marcusfirmus/oceniacz/blob/main/ask.sh"><code>ask.sh</code></a> – główny skrypt użytkownika.</p>
+  </article>
+      <p class="return-link"><a href="index.html"><b>◅</b> &nbsp; powrót do strony głównej</a></p>
+  </main>
+</body>
+</html>
